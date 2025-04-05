@@ -1,8 +1,8 @@
-import RegisterPage from "./(auth)/register/page";
+import DashboardPage from "./dashboard/page";
 
 export default function Home() {
   return (
     <>
-    <RegisterPage/>
+    <DashboardPage/>
     </>
 )}
