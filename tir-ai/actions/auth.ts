@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server/createClient'
 import { redirect } from 'next/navigation'
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -113,10 +113,15 @@ export async function signout() {
 
 export async function getUserSession() {
     const supabase = await createClient()
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) console.error(error)
-    return { user }
-  }
+
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+        return null
+    } else {
+        return {status: 'success', user: data?.user}
+    }
+}
 
 export async function signInWithGithub() {
     const origin = (await headers()).get("origin")

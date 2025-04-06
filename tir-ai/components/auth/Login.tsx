@@ -1,13 +1,12 @@
 'use client'
 import { login, signInWithGithub } from '@/actions/auth'
 import { FormEvent, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
  
 export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter()
  
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -17,8 +16,10 @@ export default function Login() {
     
     const result = await login(formData);
 
+    console.log(result.status)
+
     if (result.status === 'success') {
-      router.push('/')
+      redirect('/dashboard')
     } else {
       setError(result.status)
       console.log(error)
@@ -36,7 +37,7 @@ export default function Login() {
         className="flex flex-col items-center w-full max-w-md p-5"
       >
         <h2 className="text-white text-2xl md:text-3xl font-bold mb-6">
-          Welcome to Tir Ai
+          Welcome to my site!
         </h2>
 
         <input
