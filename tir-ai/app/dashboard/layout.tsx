@@ -24,16 +24,35 @@ export const metadata: Metadata = {
 }
 
 
-export default async function RootLayout({
+export default async function DashboardLayout({
     children,
   }: Readonly<{
     children: React.ReactNode
   }>) {
+    const cookieStore = await cookies()
+    const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
+    const user = await getUserSession()
+    const { data: userClasses } = await getUserClasses(user?.user?.id || '')
+  
+    const classItems =
+      userClasses?.map((uc) => ({
+        id: uc.class_id,
+        title: uc.classes.name,
+        url: `/classes/${uc.class_id}`, 
+      })) || []
   
     return (
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          {children}
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <AppSidebar classes={classItems} />
+            <SidebarInset>
+              <main>
+                <SidebarTrigger />
+                {children}
+              </main>
+            </SidebarInset>
+          </SidebarProvider>
         </body>
       </html>
     )

@@ -1,12 +1,13 @@
 'use client'
 import { login, signInWithGithub } from '@/actions/auth'
 import { FormEvent, useState } from 'react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
  
 export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
  
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -17,7 +18,7 @@ export default function Login() {
     const result = await login(formData);
 
     if (result.status === 'success') {
-      redirect('/')
+      router.push('/')
     } else {
       setError(result.status)
       console.log(error)

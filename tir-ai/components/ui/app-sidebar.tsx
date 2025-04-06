@@ -1,67 +1,110 @@
+"use client"
+
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import Link from "next/link"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Logo from "./Logo"
 
-// Menu items.
-const items = [
+// Static menu items
+const staticItems = [
   {
     title: "Home",
-    url: "#",
+    url: "./",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
     title: "Settings",
-    url: "#",
+    url: "./settings",
     icon: Settings,
   },
 ]
 
-export function AppSidebar() {
+type ClassItem = {
+  id: string
+  title: string
+  url: string
+}
+
+type AppSidebarProps = {
+  classes: ClassItem[]
+}
+
+export function AppSidebar({ classes }: AppSidebarProps) {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/">
+                <Logo />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
       <SidebarContent>
+        {/* Static Dashboard Section */}
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {staticItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Dynamic Classes Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel>My Classes</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {classes.length > 0 ? (
+                classes.map((classItem) => (
+                  <SidebarMenuItem key={classItem.id}>
+                    <SidebarMenuButton asChild>
+                      <Link href={classItem.url}>
+                        <Calendar /> {/* Default icon */}
+                        <span>{classItem.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              ) : (
+                <SidebarMenuItem>
+                  <span className="text-sm text-gray-500">No classes found</span>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        {/* Add footer content if needed */}
+      </SidebarFooter>
     </Sidebar>
   )
 }
