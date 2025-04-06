@@ -1,57 +1,53 @@
+"use server";
+
 import { createClient } from "@/utils/supabase/server/createClient";
-import type { User, Class, UserClass, UserClassWithClass } from '@/types/types';
 
+export async function getUserClasses() {
 
-export async function createUser(email: string, username: string): Promise<{
-  data: User | null;
-  error: any;
-}> {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-        .from('users')
-        .insert({ email, username })
-        .select()
+    const supabase = await createClient()
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user || !user.email) {
+        console.error("Error fetching user:", authError?.message || "No user or email found");
+        return [];
+    }
+
+    const userEmail = user.email;
+
+    const { data: profile, error } = await supabase
+        .from("user_profiles")
+        .select(`
+        id,
+        user_classes (
+            class_id,
+            classes (
+            id,
+            name,
+            url
+            )
+        )
+        `)
+        .eq("email", userEmail)
         .single();
-    return { data: data as User | null, error };
-}
 
-export async function createClass(name: string, description?: string): Promise<{
-  data: Class | null;
-  error: any;
-}> {
-    const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('classes')
-    .insert({ name, description })
-    .select()
-    .single();
-  return { data: data as Class | null, error };
-}
 
-export async function addUserToClass(userId: string, classId: string): Promise<{
-  data: UserClass | null;
-  error: any;
-}> {
-    const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('user_classes')
-    .insert({ user_id: userId, class_id: classId })
-    .select()
-    .single();
-  return { data: data as UserClass | null, error };
-}
+    if (error || !profile) {
+        console.error("Error fetching profile:", error?.message || "No profile found");
+        return [];
+    }
 
-export async function getUserClasses(userId: string): Promise<{
-  data: UserClassWithClass[] | null;
-  error: any;
-}> {
-    const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('user_classes')
-    .select(`
-      class_id,
-      classes (name, description)
-    `)
-    .eq('user_id', userId);
-  return { data: data as UserClassWithClass[] | null, error };
-}
+
+    console.log(profile)
+    const classItems = profile.user_classes
+        .filter((uc: any) => uc.classes)
+        .map((uc: any) => ({
+        id: uc.classes.id,
+        title: uc.classes.name,
+        url: uc.classes.url || `/classes/${uc.classes.id}`,
+        }));
+    
+    console.log(classItems)
+
+    return classItems;
+    }

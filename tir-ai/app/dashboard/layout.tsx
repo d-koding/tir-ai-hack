@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import '@/app/globals.css'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/ui/app-sidebar"
+import { getUserClasses } from "@/actions/users"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,22 +28,18 @@ export default async function DashboardLayout({
     children: React.ReactNode
   }>) {
 
-    
+    const classes = await getUserClasses();
   
     return (
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <SidebarProvider>
-            <AppSidebar/>
-            <SidebarInset>
-              <main>
-                <SidebarTrigger />
-                {children}
-              </main>
-            </SidebarInset>
-          </SidebarProvider>
-        </body>
-      </html>
+        <SidebarProvider>
+        <AppSidebar classes={classes}/>
+        <SidebarInset>
+            <main>
+            <SidebarTrigger />
+            {children}
+            </main>
+        </SidebarInset>
+        </SidebarProvider>
     )
   }
   
